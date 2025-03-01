@@ -1,0 +1,56 @@
+<!-- menu -->
+<p-menubar>
+  <ng-template pTemplate="start">
+    <a routerLink="/" class="p-menuitem-link">
+      <i class="pi pi-home"></i> User Management System
+    </a>
+  </ng-template>
+
+  <ng-template pTemplate="end">
+    <!-- Burger Icon (Shown on Small Screens) -->
+    <button class="md:hidden cursor-pointer" (click)="toggleMenu()">
+      <i class="pi pi-bars text-2xl"></i>
+    </button>
+
+    <div class="hidden md:flex  flex items-center gap-3">
+      <!-- Language Switcher -->
+      <p-select [options]="languages" [(ngModel)]="currentLang" optionLabel="name" placeholder="🌐 Language"
+        (onChange)="changeLanguage($event.value)" class="w-full md:w-56" />
+
+      <!-- Auth Controls -->
+      @if(authService.isAuthenticated() | async){
+
+      <span class="p-text-bold">{{'Welcome' | translate}}, {{user?.username}}</span>
+      <button pButton [label]="'Logout' | translate" icon="pi pi-sign-out" (click)="logout()"></button>
+      }
+      @else {
+      <a routerLink="/login" class="p-button p-button-secondary">
+        <i class="pi pi-sign-in"></i> {{'Login' | translate}}
+      </a>
+      }
+    </div>
+
+    <!-- Mobile Menu (Toggled by Burger Button) -->
+    <div *ngIf="menuOpen"
+      class="md:hidden z-10 absolute top-10 right-0 w-full bg-gray-300 lg:hidden flex flex-col space-y-2 p-4">
+      <!-- Auth Controls -->
+      @if(authService.isAuthenticated() | async){
+
+      <span class="p-text-bold">{{'Welcome' | translate}}, {{user?.username}}</span>
+      <button pButton [label]="'Logout' | translate" icon="pi pi-sign-out" (click)="logout()"></button>
+      }
+      @else {
+      <a routerLink="/login" class="p-button p-button-secondary">
+        <i class="pi pi-sign-in"></i> {{'Login' | translate}}
+      </a>
+      }
+
+      <!-- Language Switcher -->
+      <p-select [options]="languages" [(ngModel)]="currentLang" optionLabel="name" placeholder="🌐 Language"
+        (onChange)="changeLanguage($event.value)" class="w-full md:w-56" />
+    </div>
+  </ng-template>
+
+
+
+</p-menubar>

@@ -1,1 +1,139 @@
-<p>users works!</p>
+<p-card [style]="{ height: '100vh', overflow: 'hidden' }">
+
+  <!-- PrimeNG Table -->
+  <p-table #dt [value]="role === RoleEnum.ADMIN ? users : activeUsers " responsiveLayout="scroll" class="p-datatable-sm"
+    stripedRows [paginator]="true" [rows]="1" [tableStyle]="{ 'min-width': '50rem' }" [rowsPerPageOptions]="[1, 2, 3]"
+    [loading]="loading" [globalFilterFields]="['name', 'email', 'phone', 'status']" selectionMode="single"
+    [(selection)]="selectedUser">
+    <ng-template #caption>
+      <div>
+        @if(role === RoleEnum.ADMIN){
+        <!-- Add User Button -->
+        <button pButton [label]="'AddUser' | translate" icon="pi pi-plus" class="p-button-success mb-2"
+          (click)="openUserDialog()"></button>
+        }
+        <div class="flex gap-2 align">
+          <!-- search -->
+          <p-iconField iconPosition="left">
+            <p-inputIcon>
+              <i class="pi pi-search"></i>
+            </p-inputIcon>
+            <input pInputText type="text" [(ngModel)]="searchValue" (input)="filter()"
+              [placeholder]="'Search' | translate" />
+          </p-iconField>
+          <!-- clear -->
+          <button pButton [outlined]="true" (click)="clear(dt)">
+            <i class="pi pi-filter-slash"></i>
+
+            <p>{{'ClearSearch' | translate}}</p>
+          </button>
+        </div>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="id"># <p-sortIcon field="id" /></th>
+        <th pSortableColumn="name">{{'Name' | translate}} <p-sortIcon field="name" /></th>
+        <th pSortableColumn="email">{{'Email' | translate}} <p-sortIcon field="email" /></th>
+        <th pSortableColumn="phone">{{'Phone' | translate}} <p-sortIcon field="phone" /></th>
+        <th pSortableColumn="status">{{'Status' | translate}} <p-sortIcon field="status" /></th>
+        @if(role === RoleEnum.ADMIN){
+        <th>{{'Actions' | translate}}</th>
+        }
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-user>
+      <tr [pSelectableRow]="user">
+        <td>{{ user.id }}</td>
+        <td>{{ user.name }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.phone }}</td>
+        <td>
+          <p-tag [severity]="user.status === StatusEnum.ACTIVE ? 'success' : 'danger'" [value]="user.status" />
+        </td>
+        <!-- actions -->
+        @if(role === RoleEnum.ADMIN){
+        <td>
+          <div class="flex gap-2">
+            <!-- Edit Button -->
+            <button pButton type="button" icon="pi pi-pencil" class="p-button-rounded p-button-warning"
+              (click)="openUserDialog(user)">
+              {{'Edit' | translate}}
+            </button>
+            <!-- Delete Button -->
+            <button pButton type="button" icon="pi pi-trash" class="p-button-rounded p-button-danger"
+              (click)="openDeleteDialog($event, user)">
+              {{'Delete' | translate}}
+            </button>
+          </div>
+        </td>
+        }
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>
+
+
+<!-- Confirmation Dialog for Delete -->
+<p-confirmDialog></p-confirmDialog>
+
+<!-- Add/Edit Modal Dialog -->
+<p-dialog [header]="isEditMode ? ('EditUser' | translate) : ('AddUser' | translate)" [modal]="true"
+  [(visible)]="addEditDialog" [style]="{ width: '25rem' }">
+  <form [formGroup]="userAddEditForm" (ngSubmit)="saveUser()">
+    <!-- name -->
+    <div class="flex gap-4 mb-4">
+      <label for="name" class="font-semibold w-24">{{'Name' | translate}}</label>
+      <div class="flex flex-col">
+        <input id="name" type="text" class="flex-auto" pInputText formControlName="name"
+          [placeholder]="'NamePlaceholder' | translate" />
+        @if(name.touched && name.invalid){
+        @if(name.errors!['required']){
+        <small class="text-red-700">{{'NameRequiredError' | translate}}</small>
+        } @else {
+        <small class="text-red-700">{{'NameWrongError' | translate}}</small>
+        }
+        }
+      </div>
+    </div>
+    <!-- email -->
+    <div class="flex gap-4 mb-8">
+      <label for="email" class="font-semibold w-24">{{'Email' | translate}}</label>
+      <div class="flex flex-col">
+        <input pInputText id="email" class="flex-auto" formControlName="email"
+          [placeholder]="'EmailPlaceholder' | translate" />
+        @if(email.touched && email.invalid){
+        @if(email.errors!['required']){
+        <small class="text-red-700">{{'EmailRequiredError' | translate}}</small>
+        } @else {
+        <small class="text-red-700">{{'EmailWrongError' | translate}}</small>
+        }
+        }
+      </div>
+    </div>
+    <!-- phone -->
+    <div class="flex items-center gap-4 mb-8">
+      <label for="phone" class="font-semibold w-24">{{'Phone' | translate}}</label>
+      <div class="flex flex-col">
+        <input pInputText id="phone" class="flex-auto" formControlName="phone"
+          [placeholder]="'PhonePlaceholder' | translate" />
+        @if(phone.touched && phone.invalid){
+        @if(phone.errors!['required']){
+        <small class="text-red-700">{{'PhoneRequiredError' | translate}}</small>
+        } @else {
+        <small class="text-red-700">{{'PhoneWrongError' | translate}}</small>
+        }
+        }
+      </div>
+    </div>
+    <!-- action buttons -->
+    <div class="flex justify-end gap-2 mt-4">
+      <p-button [label]="'Cancel' | translate" severity="secondary" (click)="addEditDialog = false" />
+      <button pButton [label]="'Save' | translate" icon="pi pi-check" class="p-button-primary" type="submit"
+        [disabled]="!userAddEditForm.touched && !userAddEditForm.dirty"></button>
+    </div>
+  </form>
+</p-dialog>
+
+<!-- Toast -->
+<p-toast />

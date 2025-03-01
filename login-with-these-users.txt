@@ -1,0 +1,2 @@
+ { username: 'admin', email: 'admin@test.com', password: 'admin123', role: Role.ADMIN },
+ { username: 'user', email: 'user@test.com', password: 'user123', role: Role.USER }
